@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Insertable } from 'kysely';
 import { OnJob } from 'src/decorators';
-import { BulkIdResponseDto, BulkIdsDto } from 'src/dtos/asset-ids.response.dto';
+import { BulkIdErrorReason, BulkIdResponseDto, BulkIdsDto } from 'src/dtos/asset-ids.response.dto';
 import { AuthDto } from 'src/dtos/auth.dto';
 import {
   TagBulkAssetsDto,
@@ -13,6 +13,7 @@ import {
   mapTag,
 } from 'src/dtos/tag.dto';
 import { JobName, JobStatus, Permission, QueueName } from 'src/enum';
+import { TagAlbumTable } from 'src/schema/tables/tag-album.table';
 import { TagAssetTable } from 'src/schema/tables/tag-asset.table';
 import { BaseService } from 'src/services/base.service';
 import { addAssets, removeAssets } from 'src/utils/asset.util';
@@ -130,6 +131,79 @@ export class TagService extends BaseService {
     }
 
     return results;
+  }
+
+  async addAlbums(auth: AuthDto, id: string, dto: BulkIdsDto): Promise<BulkIdResponseDto[]> {
+    await this.requireAccess({ auth, permission: Permission.TagRead, ids: [id] });
+
+    const allowedAlbumIds = await this.checkAccess({
+      auth,
+      permission: Permission.AlbumUpdate,
+      ids: dto.ids,
+    });
+
+    const albumIds = [...allowedAlbumIds];
+    const results: BulkIdResponseDto[] = [];
+
+    for (const albumId of dto.ids) {
+      if (allowedAlbumIds.has(albumId)) {
+        try {
+          await this.tagRepository.addAlbumIds(id, [albumId]);
+          results.push({ id: albumId, success: true });
+        } catch (error) {
+          results.push({ id: albumId, success: false, error: BulkIdErrorReason.DUPLICATE });
+        }
+      } else {
+        results.push({ id: albumId, success: false, error: BulkIdErrorReason.NO_PERMISSION });
+      }
+    }
+
+    return results;
+  }
+
+  async removeAlbums(auth: AuthDto, id: string, dto: BulkIdsDto): Promise<BulkIdResponseDto[]> {
+    await this.requireAccess({ auth, permission: Permission.TagRead, ids: [id] });
+
+    const allowedAlbumIds = await this.checkAccess({
+      auth,
+      permission: Permission.AlbumUpdate,
+      ids: dto.ids,
+    });
+
+    const results: BulkIdResponseDto[] = [];
+
+    for (const albumId of dto.ids) {
+      if (allowedAlbumIds.has(albumId)) {
+        try {
+          await this.tagRepository.removeAlbumIds(id, [albumId]);
+          results.push({ id: albumId, success: true });
+        } catch (error) {
+          results.push({ id: albumId, success: false, error: BulkIdErrorReason.NOT_FOUND });
+        }
+      } else {
+        results.push({ id: albumId, success: false, error: BulkIdErrorReason.NO_PERMISSION });
+      }
+    }
+
+    return results;
+  }
+
+  async bulkTagAlbums(auth: AuthDto, dto: TagBulkAssetsDto): Promise<TagBulkAssetsResponseDto> {
+    const [tagIds, albumIds] = await Promise.all([
+      this.checkAccess({ auth, permission: Permission.TagRead, ids: dto.tagIds }),
+      this.checkAccess({ auth, permission: Permission.AlbumUpdate, ids: dto.assetIds }),
+    ]);
+
+    const items: Insertable<TagAlbumTable>[] = [];
+    for (const tagsId of tagIds) {
+      for (const albumsId of albumIds) {
+        items.push({ tagsId, albumsId });
+      }
+    }
+
+    const results = await this.tagRepository.upsertAlbumIds(items);
+
+    return { count: results.length };
   }
 
   @OnJob({ name: JobName.TagCleanup, queue: QueueName.BackgroundTask })

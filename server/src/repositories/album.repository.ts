@@ -49,6 +49,16 @@ const withSharedLink = (eb: ExpressionBuilder<DB, 'album'>) => {
   );
 };
 
+const withTags = (eb: ExpressionBuilder<DB, 'album'>) => {
+  return jsonArrayFrom(
+    eb
+      .selectFrom('tag')
+      .select(columns.tag)
+      .innerJoin('tag_album', 'tag.id', 'tag_album.tagsId')
+      .whereRef('tag_album.albumsId', '=', 'album.id'),
+  ).as('tags');
+};
+
 const withAssets = (eb: ExpressionBuilder<DB, 'album'>) => {
   return eb
     .selectFrom((eb) =>
@@ -82,6 +92,7 @@ export class AlbumRepository {
       .select(withOwner)
       .select(withAlbumUsers)
       .select(withSharedLink)
+      .select(withTags)
       .$if(options.withAssets, (eb) => eb.select(withAssets))
       .$narrowType<{ assets: NotNull }>()
       .executeTakeFirst();
@@ -109,6 +120,7 @@ export class AlbumRepository {
       .orderBy('album.createdAt', 'desc')
       .select(withOwner)
       .select(withAlbumUsers)
+      .select(withTags)
       .orderBy('album.createdAt', 'desc')
       .execute();
   }
@@ -147,6 +159,7 @@ export class AlbumRepository {
       .select(withOwner)
       .select(withAlbumUsers)
       .select(withSharedLink)
+      .select(withTags)
       .where('album.ownerId', '=', ownerId)
       .where('album.deletedAt', 'is', null)
       .orderBy('album.createdAt', 'desc')
@@ -181,6 +194,7 @@ export class AlbumRepository {
       .select(withAlbumUsers)
       .select(withOwner)
       .select(withSharedLink)
+      .select(withTags)
       .orderBy('album.createdAt', 'desc')
       .execute();
   }
@@ -198,6 +212,7 @@ export class AlbumRepository {
       .where((eb) => eb.not(eb.exists(eb.selectFrom('album_user').whereRef('album_user.albumsId', '=', 'album.id'))))
       .where((eb) => eb.not(eb.exists(eb.selectFrom('shared_link').whereRef('shared_link.albumId', '=', 'album.id'))))
       .select(withOwner)
+      .select(withTags)
       .orderBy('album.createdAt', 'desc')
       .execute();
   }
@@ -288,6 +303,7 @@ export class AlbumRepository {
         .select(withOwner)
         .select(withAssets)
         .select(withAlbumUsers)
+        .select(withTags)
         .$narrowType<{ assets: NotNull }>()
         .executeTakeFirstOrThrow();
     });
@@ -302,6 +318,7 @@ export class AlbumRepository {
       .returning(withOwner)
       .returning(withSharedLink)
       .returning(withAlbumUsers)
+      .returning(withTags)
       .executeTakeFirstOrThrow();
   }
 

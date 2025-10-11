@@ -82,4 +82,30 @@ export class TagController {
   ): Promise<BulkIdResponseDto[]> {
     return this.service.removeAssets(auth, id, dto);
   }
+
+  @Put(':id/albums')
+  @Authenticated({ permission: Permission.TagRead })
+  tagAlbums(
+    @Auth() auth: AuthDto,
+    @Param() { id }: UUIDParamDto,
+    @Body() dto: BulkIdsDto,
+  ): Promise<BulkIdResponseDto[]> {
+    return this.service.addAlbums(auth, id, dto);
+  }
+
+  @Delete(':id/albums')
+  @Authenticated({ permission: Permission.TagRead })
+  untagAlbums(
+    @Auth() auth: AuthDto,
+    @Body() dto: BulkIdsDto,
+    @Param() { id }: UUIDParamDto,
+  ): Promise<BulkIdResponseDto[]> {
+    return this.service.removeAlbums(auth, id, dto);
+  }
+
+  @Put('albums')
+  @Authenticated({ permission: Permission.TagRead })
+  bulkTagAlbums(@Auth() auth: AuthDto, @Body() dto: TagBulkAssetsDto): Promise<TagBulkAssetsResponseDto> {
+    return this.service.bulkTagAlbums(auth, dto);
+  }
 }

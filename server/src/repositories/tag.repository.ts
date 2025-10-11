@@ -5,6 +5,7 @@ import { columns } from 'src/database';
 import { Chunked, ChunkedSet, DummyValue, GenerateSql } from 'src/decorators';
 import { LoggingRepository } from 'src/repositories/logging.repository';
 import { DB } from 'src/schema';
+import { TagAlbumTable } from 'src/schema/tables/tag-album.table';
 import { TagAssetTable } from 'src/schema/tables/tag-asset.table';
 import { TagTable } from 'src/schema/tables/tag.table';
 
@@ -103,6 +104,61 @@ export class TagRepository {
       .execute();
 
     return new Set(results.map(({ assetId }) => assetId));
+  }
+
+  @ChunkedSet({ paramIndex: 1 })
+  @GenerateSql({ params: [DummyValue.UUID, [DummyValue.UUID]] })
+  async getAlbumIds(tagId: string, albumIds: string[]): Promise<Set<string>> {
+    if (albumIds.length === 0) {
+      return new Set();
+    }
+
+    const results = await this.db
+      .selectFrom('tag_album')
+      .select(['albumsId as albumId'])
+      .where('tagsId', '=', tagId)
+      .where('albumsId', 'in', albumIds)
+      .execute();
+
+    return new Set(results.map(({ albumId }) => albumId));
+  }
+
+  @GenerateSql({ params: [DummyValue.UUID, [DummyValue.UUID]] })
+  @Chunked({ paramIndex: 1 })
+  async addAlbumIds(tagId: string, albumIds: string[]): Promise<void> {
+    if (albumIds.length === 0) {
+      return;
+    }
+
+    await this.db
+      .insertInto('tag_album')
+      .values(albumIds.map((albumId) => ({ tagsId: tagId, albumsId: albumId })))
+      .execute();
+  }
+
+  @GenerateSql({ params: [DummyValue.UUID, [DummyValue.UUID]] })
+  @Chunked({ paramIndex: 1 })
+  async removeAlbumIds(tagId: string, albumIds: string[]): Promise<void> {
+    if (albumIds.length === 0) {
+      return;
+    }
+
+    await this.db.deleteFrom('tag_album').where('tagsId', '=', tagId).where('albumsId', 'in', albumIds).execute();
+  }
+
+  @GenerateSql({ params: [[{ albumId: DummyValue.UUID, tagsIds: [DummyValue.UUID] }]] })
+  @Chunked()
+  upsertAlbumIds(items: Insertable<TagAlbumTable>[]) {
+    if (items.length === 0) {
+      return Promise.resolve([]);
+    }
+
+    return this.db
+      .insertInto('tag_album')
+      .values(items)
+      .onConflict((oc) => oc.doNothing())
+      .returningAll()
+      .execute();
   }
 
   @GenerateSql({ params: [DummyValue.UUID, [DummyValue.UUID]] })

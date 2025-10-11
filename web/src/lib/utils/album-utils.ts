@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { NotificationType, notificationController } from '$lib/components/shared-components/notification/notification';
 import { AppRoute } from '$lib/constants';
 import {
   AlbumFilter,
@@ -10,6 +11,7 @@ import {
   type AlbumViewSettings,
 } from '$lib/stores/preferences.store';
 import { handleError } from '$lib/utils/handle-error';
+import { getFormatter } from '$lib/utils/i18n';
 import type { AlbumResponseDto } from '@immich/sdk';
 import * as sdk from '@immich/sdk';
 import { modalManager } from '@immich/ui';
@@ -133,6 +135,11 @@ export const groupOptionsMetadata: AlbumGroupOptionMetadata[] = [
   },
   {
     id: AlbumGroupBy.Owner,
+    defaultOrder: SortOrder.Asc,
+    isDisabled: () => false,
+  },
+  {
+    id: AlbumGroupBy.Tag,
     defaultOrder: SortOrder.Asc,
     isDisabled: () => false,
   },
@@ -274,4 +281,79 @@ export const sortAlbums = (albums: AlbumResponseDto[], { sortBy, orderBy }: { so
   const order = stringToSortOrder(orderBy);
 
   return sort(order, albums);
+};
+
+/**
+ * ----------------------
+ * Album Tag Management
+ * ----------------------
+ */
+export const tagAlbum = async ({
+  albumId,
+  tagIds,
+  showNotification = true,
+}: {
+  albumId: string;
+  tagIds: string[];
+  showNotification?: boolean;
+}) => {
+  for (const tagId of tagIds) {
+    // Use direct fetch until SDK is regenerated
+    const response = await fetch(`/api/tags/${tagId}/albums`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ids: [albumId] }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to tag album: ${response.statusText}`);
+    }
+  }
+
+  if (showNotification) {
+    const $t = await getFormatter();
+    notificationController.show({
+      message: $t('assets_added_to_album_count', { values: { count: tagIds.length } }),
+      type: NotificationType.Info,
+    });
+  }
+
+  return albumId;
+};
+
+export const removeAlbumTag = async ({
+  albumId,
+  tagIds,
+  showNotification = true,
+}: {
+  albumId: string;
+  tagIds: string[];
+  showNotification?: boolean;
+}) => {
+  for (const tagId of tagIds) {
+    // Use direct fetch until SDK is regenerated
+    const response = await fetch(`/api/tags/${tagId}/albums`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ids: [albumId] }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to untag album: ${response.statusText}`);
+    }
+  }
+
+  if (showNotification) {
+    const $t = await getFormatter();
+    notificationController.show({
+      message: $t('assets_removed_count', { values: { count: tagIds.length } }),
+      type: NotificationType.Info,
+    });
+  }
+
+  return albumId;
 };

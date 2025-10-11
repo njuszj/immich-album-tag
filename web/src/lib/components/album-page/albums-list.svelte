@@ -136,6 +136,59 @@
         albums,
       }));
     },
+
+    /** Group by tag */
+    [AlbumGroupBy.Tag]: (order, albums): AlbumGroup[] => {
+      const sortSign = order === SortOrder.Desc ? -1 : 1;
+      const albumsByTag = new Map<string, AlbumResponseDto[]>();
+      const untaggedAlbums: AlbumResponseDto[] = [];
+
+      // Categorize albums by their tags
+      for (const album of albums) {
+        if (!album.tags || album.tags.length === 0) {
+          untaggedAlbums.push(album);
+        } else {
+          // For albums with multiple tags, show them under each tag
+          for (const tag of album.tags) {
+            const tagKey = tag.id;
+            if (!albumsByTag.has(tagKey)) {
+              albumsByTag.set(tagKey, []);
+            }
+            albumsByTag.get(tagKey)!.push(album);
+          }
+        }
+      }
+
+      // Convert to AlbumGroup array and sort
+      const tagGroups: AlbumGroup[] = Array.from(albumsByTag.entries())
+        .map(([tagId, albums]) => {
+          const tag = albums[0].tags?.find(t => t.id === tagId);
+          return {
+            id: tagId,
+            name: tag?.value || tagId,
+            albums,
+          };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name, $locale) * sortSign);
+
+      // Add untagged albums group if there are any
+      if (untaggedAlbums.length > 0) {
+        const untaggedGroup = {
+          id: 'untagged',
+          name: $t('untagged'),
+          albums: untaggedAlbums,
+        };
+        
+        // Add untagged group at the end or beginning based on sort order
+        if (sortSign === 1) {
+          tagGroups.push(untaggedGroup);
+        } else {
+          tagGroups.unshift(untaggedGroup);
+        }
+      }
+
+      return tagGroups;
+    },
   };
 
   let albums: AlbumResponseDto[] = $state([]);
