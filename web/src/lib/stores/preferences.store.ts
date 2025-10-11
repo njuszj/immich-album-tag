@@ -107,6 +107,7 @@ export enum AlbumGroupBy {
   None = 'None',
   Year = 'Year',
   Owner = 'Owner',
+  Tag = 'Tag',
 }
 
 export enum AlbumSortBy {

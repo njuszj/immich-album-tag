@@ -2,10 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayNotEmpty, IsArray, IsString, ValidateNested } from 'class-validator';
 import _ from 'lodash';
-import { AlbumUser, AuthSharedLink, User } from 'src/database';
+import { AlbumUser, AuthSharedLink, Tag, User } from 'src/database';
 import { BulkIdErrorReason } from 'src/dtos/asset-ids.response.dto';
 import { AssetResponseDto, MapAsset, mapAsset } from 'src/dtos/asset-response.dto';
 import { AuthDto } from 'src/dtos/auth.dto';
+import { TagResponseDto, mapTag } from 'src/dtos/tag.dto';
 import { UserResponseDto, mapUser } from 'src/dtos/user.dto';
 import { AlbumUserRole, AssetOrder } from 'src/enum';
 import { Optional, ValidateBoolean, ValidateEnum, ValidateUUID } from 'src/validation';
@@ -149,12 +150,14 @@ export class AlbumResponseDto {
   isActivityEnabled!: boolean;
   @ValidateEnum({ enum: AssetOrder, name: 'AssetOrder', optional: true })
   order?: AssetOrder;
+  tags!: TagResponseDto[];
 }
 
 export type MapAlbumDto = {
   albumUsers?: AlbumUser[];
   assets?: MapAsset[];
   sharedLinks?: AuthSharedLink[];
+  tags?: any[]; // Use any[] for now to avoid import issues
   albumName: string;
   description: string;
   albumThumbnailAssetId: string | null;
@@ -212,6 +215,7 @@ export const mapAlbum = (entity: MapAlbumDto, withAssets: boolean, auth?: AuthDt
     assetCount: entity.assets?.length || 0,
     isActivityEnabled: entity.isActivityEnabled,
     order: entity.order,
+    tags: (entity.tags || []).map((tag) => mapTag(tag)),
   };
 };
 

@@ -29,6 +29,7 @@
   import SelectAllAssets from '$lib/components/timeline/actions/SelectAllAction.svelte';
   import SetVisibilityAction from '$lib/components/timeline/actions/SetVisibilityAction.svelte';
   import TagAction from '$lib/components/timeline/actions/TagAction.svelte';
+  import AlbumTagAction from '$lib/components/timeline/actions/AlbumTagAction.svelte';
   import AssetSelectControlBar from '$lib/components/timeline/AssetSelectControlBar.svelte';
   import Timeline from '$lib/components/timeline/Timeline.svelte';
   import { AlbumPageViewMode, AppRoute } from '$lib/constants';
@@ -523,6 +524,23 @@
               {/if}
               <!-- ALBUM DESCRIPTION -->
               <AlbumDescription id={album.id} bind:description={album.description} {isOwned} />
+
+              <!-- ALBUM TAGS -->
+              {#if album.tags && album.tags.length > 0}
+                <div class="my-3">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{$t('tags')}</p>
+                  <div class="flex flex-wrap gap-1">
+                    {#each album.tags as tag (tag.id)}
+                      <span
+                        class="inline-block px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                        style="background-color: {tag.color}; color: white;"
+                      >
+                        {tag.value}
+                      </span>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
             </section>
           {/if}
 
@@ -685,6 +703,7 @@
                   <MenuOption icon={mdiCogOutline} text={$t('options')} onClick={handleOptions} />
                 {/if}
 
+                <AlbumTagAction albumId={album.id} menuItem />
                 <MenuOption icon={mdiDeleteOutline} text={$t('delete_album')} onClick={() => handleRemoveAlbum()} />
               </ButtonContextMenu>
             {/if}
