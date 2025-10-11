@@ -27,8 +27,8 @@ ENTRYPOINT ["tini", "--", "/bin/bash", "-c"]
 FROM dev AS dev-container-server
 
 RUN apt-get update --allow-releaseinfo-change && \
-  apt-get install sudo inetutils-ping openjdk-11-jre-headless \
-  vim nano \
+  apt-get install sudo inetutils-ping openjdk-21-jre-headless \
+  vim nano curl gpg \
   -y --no-install-recommends --fix-missing
 
 RUN usermod -aG sudo node && \
@@ -59,6 +59,8 @@ ENV FLUTTER_CHANNEL="stable"
 ENV FLUTTER_VERSION="3.35.4"
 ENV FLUTTER_HOME=/flutter
 ENV PATH=${PATH}:${FLUTTER_HOME}/bin
+
+RUN git config --global --add safe.directory /flutter
 
 # Flutter SDK
 RUN mkdir -p ${FLUTTER_HOME} \
