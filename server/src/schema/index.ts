@@ -59,6 +59,7 @@ import { StackAuditTable } from 'src/schema/tables/stack-audit.table';
 import { StackTable } from 'src/schema/tables/stack.table';
 import { SessionSyncCheckpointTable } from 'src/schema/tables/sync-checkpoint.table';
 import { SystemMetadataTable } from 'src/schema/tables/system-metadata.table';
+import { TagAlbumTable } from 'src/schema/tables/tag-album.table';
 import { TagAssetTable } from 'src/schema/tables/tag-asset.table';
 import { TagClosureTable } from 'src/schema/tables/tag-closure.table';
 import { TagTable } from 'src/schema/tables/tag.table';
@@ -114,6 +115,7 @@ export class ImmichDatabase {
     SessionSyncCheckpointTable,
     SystemMetadataTable,
     TagTable,
+    TagAlbumTable,
     TagAssetTable,
     TagClosureTable,
     UserAuditTable,
@@ -216,6 +218,7 @@ export interface DB {
   system_metadata: SystemMetadataTable;
 
   tag: TagTable;
+  tag_album: TagAlbumTable;
   tag_asset: TagAssetTable;
   tag_closure: TagClosureTable;
 
