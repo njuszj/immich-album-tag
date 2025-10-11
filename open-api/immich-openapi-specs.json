@@ -7241,6 +7241,43 @@
         "description": "This endpoint requires the `tag.create` permission."
       }
     },
+    "/tags/albums": {
+      "put": {
+        "operationId": "bulkTagAlbums",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagBulkAssetsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "Tags"
+        ],
+        "x-immich-permission": "tag.read",
+        "description": "This endpoint requires the `tag.read` permission."
+      }
+    },
     "/tags/assets": {
       "put": {
         "operationId": "bulkTagAssets",
@@ -7393,6 +7430,98 @@
         ],
         "x-immich-permission": "tag.update",
         "description": "This endpoint requires the `tag.update` permission."
+      }
+    },
+    "/tags/{id}/albums": {
+      "delete": {
+        "operationId": "untagAlbums",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIdsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "Tags"
+        ],
+        "x-immich-permission": "tag.read",
+        "description": "This endpoint requires the `tag.read` permission."
+      },
+      "put": {
+        "operationId": "tagAlbums",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIdsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "Tags"
+        ],
+        "x-immich-permission": "tag.read",
+        "description": "This endpoint requires the `tag.read` permission."
       }
     },
     "/tags/{id}/assets": {
