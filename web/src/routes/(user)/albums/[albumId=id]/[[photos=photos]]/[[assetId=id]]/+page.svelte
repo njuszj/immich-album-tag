@@ -30,8 +30,6 @@
   import SetVisibilityAction from '$lib/components/timeline/actions/SetVisibilityAction.svelte';
   import TagAction from '$lib/components/timeline/actions/TagAction.svelte';
   import AlbumTagAction from '$lib/components/timeline/actions/AlbumTagAction.svelte';
-  import AlbumTagModal from '$lib/modals/AlbumTagModal.svelte';
-  import { removeAlbumTag } from '$lib/utils/album-utils';
   import AssetSelectControlBar from '$lib/components/timeline/AssetSelectControlBar.svelte';
   import Timeline from '$lib/components/timeline/Timeline.svelte';
   import { AlbumPageViewMode, AppRoute } from '$lib/constants';
@@ -74,7 +72,6 @@
   import { Button, Icon, IconButton, modalManager } from '@immich/ui';
   import {
     mdiArrowLeft,
-    mdiClose,
     mdiCogOutline,
     mdiDeleteOutline,
     mdiDotsVertical,
@@ -442,24 +439,6 @@
       }
     }
   };
-
-  const handleRemoveTag = async (tagId: string) => {
-    try {
-      await removeAlbumTag({
-        albumId: album.id,
-        tagIds: [tagId],
-        showNotification: true,
-      });
-      await refreshAlbum();
-    } catch (error) {
-      handleError(error, $t('errors.something_went_wrong'));
-    }
-  };
-
-  const handleAddTag = async () => {
-    await modalManager.show(AlbumTagModal, { albumId: album.id });
-    await refreshAlbum();
-  };
 </script>
 
 <div class="flex overflow-hidden" use:scrollMemoryClearer={{ routeStartsWith: AppRoute.ALBUMS }}>
@@ -489,7 +468,7 @@
               />
 
               {#if album.assetCount > 0}
-                <AlbumSummary {album} />
+                <AlbumSummary {album} {isOwned} onAlbumUpdate={refreshAlbum} />
               {/if}
 
               <!-- ALBUM SHARING -->
@@ -545,43 +524,6 @@
               {/if}
               <!-- ALBUM DESCRIPTION -->
               <AlbumDescription id={album.id} bind:description={album.description} {isOwned} />
-
-              <!-- ALBUM TAGS -->
-              <div class="my-3">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{$t('tags')}</p>
-                <div class="flex flex-wrap gap-1 items-center">
-                  {#if album.tags && album.tags.length > 0}
-                    {#each album.tags as tag (tag.id)}
-                      <div class="group relative inline-block">
-                        <span
-                          class="inline-block px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 pr-6 group-hover:pr-6"
-                          style="background-color: {tag.color}; color: white;"
-                        >
-                          {tag.value}
-                        </span>
-                        {#if isOwned}
-                          <button
-                            class="absolute right-1 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-opacity-70"
-                            onclick={() => handleRemoveTag(tag.id)}
-                            aria-label={$t('remove_tag')}
-                          >
-                            <Icon icon={mdiClose} size="12" />
-                          </button>
-                        {/if}
-                      </div>
-                    {/each}
-                  {/if}
-                  {#if isOwned}
-                    <button
-                      class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
-                      onclick={handleAddTag}
-                      aria-label={$t('add_tag')}
-                    >
-                      <Icon icon={mdiPlus} size="14" />
-                    </button>
-                  {/if}
-                </div>
-              </div>
             </section>
           {/if}
 
