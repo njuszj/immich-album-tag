@@ -1962,6 +1962,8 @@
   "tag_not_found_question": "Cannot find a tag? <link>Create a new tag.</link>",
   "tag_people": "Tag People",
   "tag_updated": "Updated tag: {tag}",
+  "tag_view_flat": "Switch to flat tag view",
+  "tag_view_tree": "Switch to tree tag view",
   "tagged_assets": "Tagged {count, plural, one {# asset} other {# assets}}",
   "tags": "Tags",
   "tap_to_run_job": "Tap to run job",

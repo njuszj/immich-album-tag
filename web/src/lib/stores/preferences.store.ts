@@ -72,6 +72,7 @@ export interface AlbumViewSettings {
     // Grouping Option => Array<Group ID>
     [group: string]: string[];
   };
+  tagViewAsTree: boolean;
 }
 
 export interface PlacesViewSettings {
@@ -127,6 +128,7 @@ export const albumViewSettings = persisted<AlbumViewSettings>('album-view-settin
   sortBy: AlbumSortBy.MostRecentPhoto,
   sortOrder: SortOrder.Desc,
   collapsedGroups: {},
+  tagViewAsTree: false,
 });
 
 export enum PlacesGroupBy {
