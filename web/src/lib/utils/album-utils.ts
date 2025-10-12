@@ -310,7 +310,7 @@ export const tagAlbum = async ({
       },
       body: JSON.stringify({ ids: [albumId] }),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Failed to tag album: ${response.statusText}`);
     }
@@ -345,7 +345,7 @@ export const removeAlbumTag = async ({
       },
       body: JSON.stringify({ ids: [albumId] }),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Failed to untag album: ${response.statusText}`);
     }
@@ -354,7 +354,7 @@ export const removeAlbumTag = async ({
   if (showNotification) {
     const $t = await getFormatter();
     notificationController.show({
-      message: $t('assets_removed_count', { values: { count: tagIds.length } }),
+      message: $t('album_tag_removed'),
       type: NotificationType.Info,
     });
   }

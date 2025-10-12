@@ -523,6 +523,7 @@
   "assets_moved_to_trash_count": "已移动{count, plural, one {#个项目} other {#个项目}}到回收站",
   "assets_permanently_deleted_count": "已永久删除{count, plural, one {#个项目} other {#个项目}}",
   "assets_removed_count": "已移除{count, plural, one {#个项目} other {#个项目}}",
+  "album_tag_removed": "移除了一个相册标签",
   "assets_removed_permanently_from_device": "已从设备中永久移除 {count} 个项目",
   "assets_restore_confirmation": "确定要恢复回收站中的所有项目吗？该操作无法撤消！请注意，脱机项目无法通过这种方式恢复。",
   "assets_restored_count": "已恢复{count, plural, one {#个项目} other {#个项目}}",

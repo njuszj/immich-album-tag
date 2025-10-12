@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { getAlbumDateRange } from '$lib/utils/date-time';
-  import { removeAlbumTag } from '$lib/utils/album-utils';
-  import { handleError } from '$lib/utils/handle-error';
+  import AlbumTagModal from '$lib/modals/AlbumTagModal.svelte';
   import { preferences } from '$lib/stores/user.store';
+  import { removeAlbumTag } from '$lib/utils/album-utils';
+  import { getAlbumDateRange } from '$lib/utils/date-time';
+  import { handleError } from '$lib/utils/handle-error';
   import type { AlbumResponseDto } from '@immich/sdk';
   import { Icon, modalManager } from '@immich/ui';
   import { mdiClose, mdiPlus } from '@mdi/js';
   import { t } from 'svelte-i18n';
-  import AlbumTagModal from '$lib/modals/AlbumTagModal.svelte';
 
   interface Props {
     album: AlbumResponseDto;
@@ -51,7 +51,7 @@
         <div class="group relative inline-block">
           <span
             class="inline-block px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 pr-6 group-hover:pr-6"
-            style="background-color: {tag.color}; color: white;"
+            style="background-color: {tag.color}; color: #4250AF;"
           >
             {tag.value}
           </span>
