@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import AlbumCardGroup from '$lib/components/album-page/album-card-group.svelte';
+  import AlbumTagTreeView from '$lib/components/album-page/album-tag-tree-view.svelte';
   import AlbumsTable from '$lib/components/album-page/albums-table.svelte';
   import MenuOption from '$lib/components/shared-components/context-menu/menu-option.svelte';
   import RightClickContextMenu from '$lib/components/shared-components/context-menu/right-click-context-menu.svelte';
@@ -42,6 +43,7 @@
   import { mdiDeleteOutline, mdiDownload, mdiRenameOutline, mdiShareVariantOutline } from '@mdi/js';
   import { groupBy } from 'lodash-es';
   import { onMount, type Snippet } from 'svelte';
+  import { TreeNode } from '$lib/utils/tree-utils';
   import { t } from 'svelte-i18n';
   import { run } from 'svelte/legacy';
 
@@ -139,6 +141,18 @@
 
     /** Group by tag */
     [AlbumGroupBy.Tag]: (order, albums): AlbumGroup[] => {
+      // Check if user wants tree view
+      if (userSettings.tagViewAsTree) {
+        // For tree view, we return a special marker to indicate tree mode
+        // The actual tree will be handled in the component
+        return [{
+          id: '__tree__',
+          name: 'Tag Tree',
+          albums,
+        }];
+      }
+
+      // Flat tag view
       const sortSign = order === SortOrder.Desc ? -1 : 1;
       const albumsByTag = new Map<string, AlbumResponseDto[]>();
       const untaggedAlbums: AlbumResponseDto[] = [];
@@ -189,6 +203,9 @@
 
       return tagGroups;
     },
+
+    /** Group by tag tree */
+    // Removed TagTree - now handled by Tag grouping with tagViewAsTree toggle
   };
 
   let albums: AlbumResponseDto[] = $state([]);
@@ -203,6 +220,59 @@
   let contextMenuPosition: ContextMenuPosition = $state({ x: 0, y: 0 });
   let contextMenuTargetAlbum: AlbumResponseDto | undefined = $state();
   let isOpen = $state(false);
+
+  // Helper function to collect all tree node IDs from albums
+  const getTagTreeNodeIds = (albums: AlbumResponseDto[]): string[] => {
+    const allTags: { value: string; id: string; color?: string }[] = [];
+    const nodeIds = new Set<string>();
+
+    // Collect all unique tags
+    for (const album of albums) {
+      if (album.tags && album.tags.length > 0) {
+        for (const tag of album.tags) {
+          if (!allTags.find(t => t.id === tag.id)) {
+            allTags.push({
+              value: tag.value,
+              id: tag.id,
+              color: tag.color,
+            });
+          }
+        }
+      }
+    }
+
+    // Create tree and collect all node paths
+    if (allTags.length > 0) {
+      const tree = TreeNode.fromTags(allTags.map(tag => ({
+        id: tag.id,
+        value: tag.value,
+        color: tag.color,
+        name: tag.value.split('/').pop() || tag.value,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })));
+
+      // Recursively collect all node paths
+      const collectNodeIds = (node: TreeNode) => {
+        if (node.path) {
+          nodeIds.add(node.path);
+        }
+        for (const child of node.children) {
+          collectNodeIds(child);
+        }
+      };
+
+      collectNodeIds(tree);
+    }
+
+    // Add untagged albums if any exist
+    const hasUntaggedAlbums = albums.some(album => !album.tags || album.tags.length === 0);
+    if (hasUntaggedAlbums) {
+      nodeIds.add('untagged');
+    }
+
+    return Array.from(nodeIds);
+  };
 
   // Step 1: Filter between Owned and Shared albums, or both.
   run(() => {
@@ -251,7 +321,12 @@
       albums: sortAlbums(group.albums, { sortBy: userSettings.sortBy, orderBy: userSettings.sortOrder }),
     }));
 
-    albumGroupIds = groupedAlbums.map(({ id }) => id);
+    // For Tag grouping with tree view, we need to collect all tree node IDs
+    if (albumGroupOption === AlbumGroupBy.Tag && userSettings.tagViewAsTree) {
+      albumGroupIds = getTagTreeNodeIds(filteredAlbums);
+    } else {
+      albumGroupIds = groupedAlbums.map(({ id }) => id);
+    }
   });
 
   let showFullContextMenu = $derived(
@@ -441,6 +516,15 @@
         showDateRange
         showItemCount
         onShowContextMenu={showAlbumContextMenu}
+      />
+    {:else if albumGroupOption === AlbumGroupBy.Tag && userSettings.tagViewAsTree}
+      <!-- Tag Tree View -->
+      <AlbumTagTreeView
+        albums={filteredAlbums}
+        userSettings={userSettings}
+        {showOwner}
+        onShowContextMenu={showAlbumContextMenu}
+        onTreeNodeIdsCollected={(nodeIds) => { albumGroupIds = nodeIds; }}
       />
     {:else}
       {#each groupedAlbums as albumGroup (albumGroup.id)}

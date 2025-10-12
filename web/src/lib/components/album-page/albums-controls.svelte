@@ -23,7 +23,7 @@
     groupOptionsMetadata,
     sortOptionsMetadata,
   } from '$lib/utils/album-utils';
-  import { Button, IconButton, Text } from '@immich/ui';
+  import { Button, IconButton, Text, Switch } from '@immich/ui';
   import {
     mdiArrowDownThin,
     mdiArrowUpThin,
@@ -35,6 +35,7 @@
     mdiUnfoldLessHorizontal,
     mdiUnfoldMoreHorizontal,
     mdiViewGridOutline,
+    mdiFileTree,
   } from '@mdi/js';
   import { t } from 'svelte-i18n';
   import { fly } from 'svelte/transition';
@@ -111,6 +112,12 @@
     [AlbumGroupBy.Year]: $t('group_year'),
     [AlbumGroupBy.Tag]: $t('tag'),
   });
+
+  const handleToggleTagTreeView = () => {
+    $albumViewSettings.tagViewAsTree = !$albumViewSettings.tagViewAsTree;
+  };
+
+  let isTagGrouping = $derived(selectedGroupOption?.id === AlbumGroupBy.Tag);
 </script>
 
 <!-- Filter Albums by Sharing Status (All, Owned, Shared) -->
@@ -163,6 +170,23 @@
     disabled: isDisabled(),
   })}
 />
+
+<!-- Tag Tree View Toggle -->
+{#if isTagGrouping}
+  <span in:fly={{ x: -50, duration: 250 }}>
+    <div class="flex items-center gap-2 px-3">
+      <IconButton
+        title={$albumViewSettings.tagViewAsTree ? $t('tag_view_flat') : $t('tag_view_tree')}
+        onclick={handleToggleTagTreeView}
+        variant="ghost"
+        color="secondary"
+        shape="round"
+        icon={mdiFileTree}
+        aria-label={$albumViewSettings.tagViewAsTree ? $t('tag_view_flat') : $t('tag_view_tree')}
+      />
+    </div>
+  </span>
+{/if}
 
 {#if getSelectedAlbumGroupOption($albumViewSettings) !== AlbumGroupBy.None}
   <span in:fly={{ x: -50, duration: 250 }}>

@@ -3,6 +3,7 @@
   import UserPageLayout, { headerId } from '$lib/components/layouts/user-page-layout.svelte';
   import Breadcrumbs from '$lib/components/shared-components/tree/breadcrumbs.svelte';
   import TreeItemThumbnails from '$lib/components/shared-components/tree/tree-item-thumbnails.svelte';
+  import TagAlbums from '$lib/components/shared-components/tree/tag-albums.svelte';
   import TreeItems from '$lib/components/shared-components/tree/tree-items.svelte';
   import Sidebar from '$lib/components/sidebar/sidebar.svelte';
   import Timeline from '$lib/components/timeline/Timeline.svelte';
@@ -33,6 +34,7 @@
   onDestroy(() => timelineManager.destroy());
 
   let tags = $derived<TagResponseDto[]>(data.tags);
+  let albums = $derived(data.albums);
   const tree = $derived(TreeNode.fromTags(tags));
   const tag = $derived(tree.traverse(data.path));
 
@@ -116,13 +118,30 @@
   <Breadcrumbs node={tag} icon={mdiTagMultiple} title={$t('tags')} {getLink} />
 
   <section class="mt-2 h-[calc(100%-(--spacing(20)))] overflow-auto immich-scrollbar">
-    {#if tag.hasAssets}
-      <Timeline enableRouting={true} {timelineManager} {assetInteraction} removeAction={AssetAction.UNARCHIVE}>
-        {#snippet empty()}
-          <TreeItemThumbnails items={tag.children} icon={mdiTag} onClick={handleNavigation} />
-        {/snippet}
-      </Timeline>
-    {:else}
+    <!-- Albums Section - Show first for the selected tag -->
+    {#if tag.id}
+      <div class="mb-6">
+        <TagAlbums tag={tag} {albums} />
+      </div>
+    {/if}
+    
+    <!-- Assets and Child Tags Section -->
+    {#if tag.id}
+      <!-- For a specific tag, show timeline with assets and child tags -->
+      {@const hasAlbums = albums.filter((album) => album.tags?.some((t) => t.id === tag.id)).length > 0}
+      <div class={hasAlbums ? "border-t border-gray-200 dark:border-gray-700 pt-6" : ""}>
+        <!-- Show timeline which will include both assets and child tags in empty state -->
+        <Timeline enableRouting={true} {timelineManager} {assetInteraction} removeAction={AssetAction.UNARCHIVE}>
+          {#snippet empty()}
+            <!-- Show child tags when there are no assets -->
+            {#if tag.children.length > 0}
+              <TreeItemThumbnails items={tag.children} icon={mdiTag} onClick={handleNavigation} />
+            {/if}
+          {/snippet}
+        </Timeline>
+      </div>
+    {:else if tag.children.length > 0}
+      <!-- Root level - show child tags only -->
       <TreeItemThumbnails items={tag.children} icon={mdiTag} onClick={handleNavigation} />
     {/if}
   </section>
