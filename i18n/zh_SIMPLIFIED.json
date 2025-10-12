@@ -1958,6 +1958,7 @@
   "sync_status_subtitle": "查看和管理同步系统",
   "sync_upload_album_setting_subtitle": "创建照片和视频并上传到 Immich 上的选定相册中",
   "tag": "标签",
+  "tag_album": "标记相册",
   "tag_assets": "标记项目",
   "tag_created": "已创建标签：{tag}",
   "tag_feature_description": "按逻辑标签分组并浏览照片和视频",

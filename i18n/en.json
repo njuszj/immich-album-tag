@@ -1958,6 +1958,7 @@
   "sync_status_subtitle": "View and manage the sync system",
   "sync_upload_album_setting_subtitle": "Create and upload your photos and videos to the selected albums on Immich",
   "tag": "Tag",
+  "tag_album": "Tag album",
   "tag_assets": "Tag assets",
   "tag_created": "Created tag: {tag}",
   "tag_feature_description": "Browsing photos and videos grouped by logical tag topics",
