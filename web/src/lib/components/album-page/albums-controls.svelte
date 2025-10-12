@@ -23,10 +23,11 @@
     groupOptionsMetadata,
     sortOptionsMetadata,
   } from '$lib/utils/album-utils';
-  import { Button, IconButton, Text, Switch } from '@immich/ui';
+  import { Button, IconButton, Text } from '@immich/ui';
   import {
     mdiArrowDownThin,
     mdiArrowUpThin,
+    mdiFileTree,
     mdiFolderArrowDownOutline,
     mdiFolderArrowUpOutline,
     mdiFolderRemoveOutline,
@@ -35,7 +36,6 @@
     mdiUnfoldLessHorizontal,
     mdiUnfoldMoreHorizontal,
     mdiViewGridOutline,
-    mdiFileTree,
   } from '@mdi/js';
   import { t } from 'svelte-i18n';
   import { fly } from 'svelte/transition';
@@ -110,14 +110,19 @@
     [AlbumGroupBy.None]: $t('group_no'),
     [AlbumGroupBy.Owner]: $t('group_owner'),
     [AlbumGroupBy.Year]: $t('group_year'),
-    [AlbumGroupBy.Tag]: $t('tag'),
+    [AlbumGroupBy.Tag]: $t('group_tag'),
   });
 
   const handleToggleTagTreeView = () => {
     $albumViewSettings.tagViewAsTree = !$albumViewSettings.tagViewAsTree;
+    // When enabling tree view, force cover mode
+    if ($albumViewSettings.tagViewAsTree) {
+      $albumViewSettings.view = AlbumViewMode.Cover;
+    }
   };
 
   let isTagGrouping = $derived(selectedGroupOption?.id === AlbumGroupBy.Tag);
+  let isTreeViewActive = $derived(isTagGrouping && $albumViewSettings.tagViewAsTree);
 </script>
 
 <!-- Filter Albums by Sharing Status (All, Owned, Shared) -->
@@ -221,7 +226,20 @@
 {/if}
 
 <!-- Cover/List Display Toggle -->
-{#if $albumViewSettings.view === AlbumViewMode.List}
+{#if isTreeViewActive}
+  <!-- When tree view is active, show disabled cover button to indicate it's locked to cover mode -->
+  <Button
+    leadingIcon={mdiViewGridOutline}
+    onclick={() => {}}
+    size="small"
+    variant="ghost"
+    color="secondary"
+    disabled
+    title={$t('tree_view_cover_mode_locked')}
+  >
+    <Text class="hidden md:block">{$t('covers')}</Text>
+  </Button>
+{:else if $albumViewSettings.view === AlbumViewMode.List}
   <Button
     leadingIcon={mdiViewGridOutline}
     onclick={() => handleChangeListMode()}
