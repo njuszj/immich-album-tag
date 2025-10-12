@@ -2,6 +2,7 @@
   import { getAlbumDateRange } from '$lib/utils/date-time';
   import { removeAlbumTag } from '$lib/utils/album-utils';
   import { handleError } from '$lib/utils/handle-error';
+  import { preferences } from '$lib/stores/user.store';
   import type { AlbumResponseDto } from '@immich/sdk';
   import { Icon, modalManager } from '@immich/ui';
   import { mdiClose, mdiPlus } from '@mdi/js';
@@ -43,7 +44,7 @@
   <span>{getAlbumDateRange(album)}</span>
   <span>•</span>
   <span>{$t('items_count', { values: { count: album.assetCount } })}</span>
-  {#if album.tags && album.tags.length > 0}
+  {#if $preferences?.tags?.enabled && album.tags && album.tags.length > 0}
     <span>•</span>
     <div class="flex flex-wrap gap-1 items-center">
       {#each album.tags as tag (tag.id)}
@@ -75,7 +76,7 @@
         </button>
       {/if}
     </div>
-  {:else if isOwned}
+  {:else if $preferences?.tags?.enabled && isOwned}
     <span>•</span>
     <button
       class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"

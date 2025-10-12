@@ -686,7 +686,9 @@
                   <MenuOption icon={mdiCogOutline} text={$t('options')} onClick={handleOptions} />
                 {/if}
 
-                <AlbumTagAction albumId={album.id} menuItem />
+                {#if $preferences?.tags?.enabled}
+                  <AlbumTagAction albumId={album.id} menuItem />
+                {/if}
                 <MenuOption icon={mdiDeleteOutline} text={$t('delete_album')} onClick={() => handleRemoveAlbum()} />
               </ButtonContextMenu>
             {/if}
