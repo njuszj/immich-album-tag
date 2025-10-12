@@ -147,7 +147,7 @@
       <ChangeDescription menuItem />
       <ChangeLocation menuItem />
       <ArchiveAction menuItem onArchive={(assetIds) => timelineManager.removeAssets(assetIds)} />
-      {#if $preferences.tags.enabled}
+      {#if $preferences.tags.enabled && assetInteraction.isAllUserOwned}
         <TagAction menuItem />
       {/if}
       <DeleteAssets

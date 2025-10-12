@@ -4,6 +4,7 @@
   import { AppRoute } from '$lib/constants';
   import { authManager } from '$lib/managers/auth-manager.svelte';
   import AssetTagModal from '$lib/modals/AssetTagModal.svelte';
+  import { preferences } from '$lib/stores/user.store';
   import { removeTag } from '$lib/utils/asset-utils';
   import { getAssetInfo, type AssetResponseDto } from '@immich/sdk';
   import { Icon, modalManager } from '@immich/ui';
@@ -36,7 +37,7 @@
 
 <svelte:document use:shortcut={{ shortcut: { key: 't' }, onShortcut: handleAddTag }} />
 
-{#if isOwner && !authManager.isSharedLink}
+{#if $preferences?.tags?.enabled && isOwner && !authManager.isSharedLink}
   <section class="px-4 mt-4">
     <div class="flex h-10 w-full items-center justify-between text-sm">
       <h2 class="uppercase">{$t('tags')}</h2>

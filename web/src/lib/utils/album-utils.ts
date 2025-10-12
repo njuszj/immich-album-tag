@@ -2,14 +2,15 @@ import { goto } from '$app/navigation';
 import { NotificationType, notificationController } from '$lib/components/shared-components/notification/notification';
 import { AppRoute } from '$lib/constants';
 import {
-  AlbumFilter,
-  AlbumGroupBy,
-  AlbumSortBy,
-  SortOrder,
-  albumViewSettings,
-  locale,
-  type AlbumViewSettings,
+    AlbumFilter,
+    AlbumGroupBy,
+    AlbumSortBy,
+    SortOrder,
+    albumViewSettings,
+    locale,
+    type AlbumViewSettings,
 } from '$lib/stores/preferences.store';
+import { preferences } from '$lib/stores/user.store';
 import { handleError } from '$lib/utils/handle-error';
 import { getFormatter } from '$lib/utils/i18n';
 import type { AlbumResponseDto } from '@immich/sdk';
@@ -141,7 +142,10 @@ export const groupOptionsMetadata: AlbumGroupOptionMetadata[] = [
   {
     id: AlbumGroupBy.Tag,
     defaultOrder: SortOrder.Asc,
-    isDisabled: () => false,
+    isDisabled: () => {
+      const userPrefs = get(preferences);
+      return !userPrefs?.tags?.enabled;
+    },
   },
 ];
 
