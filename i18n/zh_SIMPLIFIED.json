@@ -1109,6 +1109,7 @@
   "group_owner": "按所有者分组",
   "group_places_by": "地点分组依据...",
   "group_year": "按年分组",
+  "group_tag": "按标签分组",
   "haptic_feedback_switch": "启用振动反馈",
   "haptic_feedback_title": "振动反馈",
   "has_quota": "配额大小",
