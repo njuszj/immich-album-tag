@@ -1,3 +1,8 @@
+<p align="center">
+  Notice: this project is forked from https://github.com/immich-app/immich and add the ability of tag view for albums.
+  <br/>
+</p>
+
 <p align="center"> 
   <br/>
   <a href="https://opensource.org/license/agpl-v3"><img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg?color=3F51B5&style=for-the-badge&label=License&logoColor=000000&labelColor=ececec" alt="License: AGPLv3"></a>
