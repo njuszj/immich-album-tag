@@ -50,7 +50,8 @@ fix_permissions() {
     log "Fixing permissions for ${IMMICH_WORKSPACE}"
 
     # Change ownership for directories that exist
-    for dir in "${IMMICH_WORKSPACE}/.vscode" \
+    for dir in "/data" \
+        "${IMMICH_WORKSPACE}/.vscode" \
         "${IMMICH_WORKSPACE}/server/upload" \
         "${IMMICH_WORKSPACE}/.pnpm-store" \
         "${IMMICH_WORKSPACE}/.github/node_modules" \

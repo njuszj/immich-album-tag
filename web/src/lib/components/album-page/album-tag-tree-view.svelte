@@ -1,12 +1,12 @@
 <script lang="ts">
   import AlbumCardGroup from '$lib/components/album-page/album-card-group.svelte';
-  import AlbumTableRow from '$lib/components/album-page/albums-table-row.svelte';
   import AlbumTableHeader from '$lib/components/album-page/albums-table-header.svelte';
-  import { preferences } from '$lib/stores/user.store';
+  import AlbumTableRow from '$lib/components/album-page/albums-table-row.svelte';
   import { AlbumViewMode, type AlbumViewSettings } from '$lib/stores/preferences.store';
-  import { toggleAlbumGroupCollapsing, isAlbumGroupCollapsed, sortOptionsMetadata } from '$lib/utils/album-utils';
-  import { TreeNode } from '$lib/utils/tree-utils';
+  import { preferences } from '$lib/stores/user.store';
+  import { isAlbumGroupCollapsed, sortOptionsMetadata, toggleAlbumGroupCollapsing } from '$lib/utils/album-utils';
   import type { ContextMenuPosition } from '$lib/utils/context-menu';
+  import { TreeNode } from '$lib/utils/tree-utils';
   import type { AlbumResponseDto } from '@immich/sdk';
   import { Icon } from '@immich/ui';
   import { mdiChevronDown, mdiChevronRight, mdiTag } from '@mdi/js';
@@ -40,7 +40,7 @@
       } else {
         for (const tag of album.tags) {
           // Add tag to unique list if not already present
-          if (!allTags.find(t => t.id === tag.id)) {
+          if (!allTags.find((t) => t.id === tag.id)) {
             allTags.push({
               value: tag.value,
               id: tag.id,
@@ -52,7 +52,7 @@
           if (!tagToAlbumsMap.has(tag.id)) {
             tagToAlbumsMap.set(tag.id, []);
           }
-          if (!tagToAlbumsMap.get(tag.id)!.find(a => a.id === album.id)) {
+          if (!tagToAlbumsMap.get(tag.id)!.find((a) => a.id === album.id)) {
             tagToAlbumsMap.get(tag.id)!.push(album);
           }
         }
@@ -60,14 +60,16 @@
     }
 
     // Create tree structure
-    const tree = TreeNode.fromTags(allTags.map(tag => ({
-      id: tag.id,
-      value: tag.value,
-      color: tag.color,
-      name: tag.value.split('/').pop() || tag.value,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }))) as TagTreeNode;
+    const tree = TreeNode.fromTags(
+      allTags.map((tag) => ({
+        id: tag.id,
+        value: tag.value,
+        color: tag.color,
+        name: tag.value.split('/').pop() || tag.value,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })),
+    ) as TagTreeNode;
 
     // Attach album data to tree nodes
     const attachAlbumsToNode = (node: TagTreeNode) => {
@@ -84,16 +86,18 @@
 
     // Add untagged albums if any
     if (untaggedAlbums.length > 0) {
-      const untaggedNode = TreeNode.fromTags([{
-        id: 'untagged',
-        value: 'untagged',
-        color: undefined,
-        name: 'untagged',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }]).children[0] as TagTreeNode;
+      const untaggedNode = TreeNode.fromTags([
+        {
+          id: 'untagged',
+          value: 'untagged',
+          color: undefined,
+          name: 'untagged',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]).children[0] as TagTreeNode;
       (untaggedNode as any).albums = untaggedAlbums;
-      (tree as any).set('untagged', untaggedNode);
+      (tree as TreeNode).children.push(untaggedNode);
     }
 
     return tree;
@@ -107,7 +111,7 @@
   $effect(() => {
     if (onTreeNodeIdsCollected) {
       const nodeIds = new Set<string>();
-      
+
       const collectNodeIds = (node: TagTreeNode) => {
         if (node.path) {
           nodeIds.add(node.path);
@@ -116,10 +120,10 @@
           collectNodeIds(child as TagTreeNode);
         }
       };
-      
+
       const tree = tagTree();
       collectNodeIds(tree);
-      
+
       onTreeNodeIdsCollected(Array.from(nodeIds));
     }
   });
@@ -131,7 +135,9 @@
     <div class="album-tag-tree-list">
       <!-- Table header -->
       <table class="w-full text-start mb-4">
-        <thead class="mb-4 flex h-12 w-full rounded-md border bg-gray-50 text-primary dark:border-immich-dark-gray dark:bg-immich-dark-gray">
+        <thead
+          class="mb-4 flex h-12 w-full rounded-md border bg-gray-50 text-primary dark:border-immich-dark-gray dark:bg-immich-dark-gray"
+        >
           <tr class="flex w-full place-items-center p-2 md:p-5">
             {#each sortOptionsMetadata as option, index (index)}
               <AlbumTableHeader {option} />
@@ -139,7 +145,7 @@
           </tr>
         </thead>
       </table>
-      
+
       {#each tagTree().children as node (node.path)}
         {@render renderTreeNodeList(node, 0)}
       {/each}
@@ -168,11 +174,7 @@
           onclick={() => handleNodeToggle(node.path)}
           class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded w-full text-left"
         >
-          <Icon
-            icon={isCollapsed ? mdiChevronRight : mdiChevronDown}
-            size="20"
-            class="text-gray-400 flex-shrink-0"
-          />
+          <Icon icon={isCollapsed ? mdiChevronRight : mdiChevronDown} size="20" class="text-gray-400 flex-shrink-0" />
           <Icon icon={mdiTag} size="20" color={node.color} class="text-gray-600 dark:text-gray-300 flex-shrink-0" />
           <span class="font-medium text-sm truncate">
             {node.value === 'untagged' ? $t('untagged') : node.value.split('/').pop()}
@@ -187,13 +189,7 @@
         <!-- Render albums for this node -->
         {#if hasAlbums}
           <div class="tree-node-albums" style="margin-left: 1.5rem; margin-bottom: 1rem">
-            <AlbumCardGroup
-              albums={(node as any).albums}
-              {showOwner}
-              showDateRange
-              showItemCount
-              {onShowContextMenu}
-            />
+            <AlbumCardGroup albums={(node as any).albums} {showOwner} showDateRange showItemCount {onShowContextMenu} />
           </div>
         {/if}
 
@@ -215,7 +211,8 @@
   {@const hasChildren = node.children.length > 0}
   {@const hasAlbums = (node as any).albums && (node as any).albums.length > 0}
   {@const shouldShow = hasChildren || hasAlbums}
-  {@const indent = level * 2}  <!-- 2rem per level for clearer hierarchy -->
+  {@const indent = level * 2}
+  <!-- 2rem per level for clearer hierarchy -->
 
   {#if shouldShow}
     <div class="tree-node-list">
@@ -226,11 +223,7 @@
           onclick={() => handleNodeToggle(node.path)}
           class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded w-full text-left mb-2 bg-gray-50 dark:bg-immich-dark-gray/50"
         >
-          <Icon
-            icon={isCollapsed ? mdiChevronRight : mdiChevronDown}
-            size="24"
-            class="text-gray-400 flex-shrink-0"
-          />
+          <Icon icon={isCollapsed ? mdiChevronRight : mdiChevronDown} size="24" class="text-gray-400 flex-shrink-0" />
           <Icon icon={mdiTag} size="24" color={node.color} class="text-gray-600 dark:text-gray-300 flex-shrink-0" />
           <div class="flex flex-col flex-1 min-w-0">
             <span class="font-bold text-lg truncate text-black dark:text-white">
