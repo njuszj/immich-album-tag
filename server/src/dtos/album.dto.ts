@@ -9,11 +9,15 @@ import { AuthDto } from 'src/dtos/auth.dto';
 import { TagResponseDto, mapTag } from 'src/dtos/tag.dto';
 import { UserResponseDto, mapUser } from 'src/dtos/user.dto';
 import { AlbumUserRole, AssetOrder } from 'src/enum';
+import { AssetType } from 'src/enum';
 import { Optional, ValidateBoolean, ValidateEnum, ValidateUUID } from 'src/validation';
 
 export class AlbumInfoDto {
   @ValidateBoolean({ optional: true })
   withoutAssets?: boolean;
+
+  @ValidateEnum({ enum: AssetType, name: 'AssetType', optional: true })
+  assetType?: AssetType;
 }
 
 export class AlbumUserAddDto {

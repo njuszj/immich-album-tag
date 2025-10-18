@@ -17,6 +17,7 @@
   } from '$lib/components/shared-components/notification/notification';
   import UserAvatar from '$lib/components/shared-components/user-avatar.svelte';
   import AddToAlbum from '$lib/components/timeline/actions/AddToAlbumAction.svelte';
+  import AlbumTagAction from '$lib/components/timeline/actions/AlbumTagAction.svelte';
   import ArchiveAction from '$lib/components/timeline/actions/ArchiveAction.svelte';
   import ChangeDate from '$lib/components/timeline/actions/ChangeDateAction.svelte';
   import ChangeDescription from '$lib/components/timeline/actions/ChangeDescriptionAction.svelte';
@@ -29,7 +30,6 @@
   import SelectAllAssets from '$lib/components/timeline/actions/SelectAllAction.svelte';
   import SetVisibilityAction from '$lib/components/timeline/actions/SetVisibilityAction.svelte';
   import TagAction from '$lib/components/timeline/actions/TagAction.svelte';
-  import AlbumTagAction from '$lib/components/timeline/actions/AlbumTagAction.svelte';
   import AssetSelectControlBar from '$lib/components/timeline/AssetSelectControlBar.svelte';
   import Timeline from '$lib/components/timeline/Timeline.svelte';
   import { AlbumPageViewMode, AppRoute } from '$lib/constants';
@@ -49,7 +49,6 @@
   import { handlePromiseError, makeSharedLinkUrl } from '$lib/utils';
   import { confirmAlbumDelete } from '$lib/utils/album-utils';
   import { cancelMultiselect, downloadAlbum } from '$lib/utils/asset-utils';
-  import { openFileUploadDialog } from '$lib/utils/file-uploader';
   import { handleError } from '$lib/utils/handle-error';
   import {
     isAlbumsRoute,
@@ -77,6 +76,7 @@
     mdiDeleteOutline,
     mdiDotsVertical,
     mdiDownload,
+    mdiFileOutline,
     mdiFilter,
     mdiImageOutline,
     mdiImagePlusOutline,
@@ -85,9 +85,9 @@
     mdiPresentationPlay,
     mdiShareVariantOutline,
     mdiUpload,
-    mdiVideo,
+    mdiVideoOutline,
   } from '@mdi/js';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { t } from 'svelte-i18n';
   import { fly } from 'svelte/transition';
   import type { PageData } from './$types';
@@ -108,7 +108,19 @@
   let isCreatingSharedAlbum = $state(false);
   let isShowActivity = $state(false);
   let albumOrder: AssetOrder | undefined = $state(data.album.order);
+
+  // 从URL参数中获取资产类型筛选器的初始值
   let assetTypeFilter: AssetTypeEnum | undefined = $state(undefined);
+
+  onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const assetTypeParam = urlParams.get('assetType');
+    if (assetTypeParam === 'IMAGE') {
+      assetTypeFilter = AssetTypeEnum.Image;
+    } else if (assetTypeParam === 'VIDEO') {
+      assetTypeFilter = AssetTypeEnum.Video;
+    }
+  });
 
   const assetInteraction = new AssetInteraction();
   const timelineInteraction = new AssetInteraction();
@@ -134,6 +146,24 @@
     }
   });
 
+  // 当资产类型筛选器改变时，更新URL参数
+  $effect(() => {
+    const url = new URL(window.location.href);
+    if (assetTypeFilter === AssetTypeEnum.Image) {
+      url.searchParams.set('assetType', 'IMAGE');
+    } else if (assetTypeFilter === AssetTypeEnum.Video) {
+      url.searchParams.set('assetType', 'VIDEO');
+    } else {
+      // 只有当参数存在时才删除，避免不必要的URL更新
+      if (url.searchParams.has('assetType')) {
+        url.searchParams.delete('assetType');
+        window.history.replaceState({}, '', url.toString());
+      }
+      return;
+    }
+    window.history.replaceState({}, '', url.toString());
+  });
+
   const handleFavorite = async () => {
     try {
       await activityManager.toggleLike();
@@ -148,11 +178,11 @@
 
   const handleStartSlideshow = async () => {
     const asset =
-      $slideshowNavigation === SlideshowNavigation.Shuffle
+      slideshowNavigation === SlideshowNavigation.Shuffle
         ? await timelineManager.getRandomAsset()
         : timelineManager.months[0]?.dayGroups[0]?.viewerAssets[0]?.asset;
     if (asset) {
-      handlePromiseError(setAssetId(asset.id).then(() => ($slideshowState = SlideshowState.PlaySlideshow)));
+      handlePromiseError(setAssetId(asset.id).then(() => (slideshowState = SlideshowState.PlaySlideshow)));
     }
   };
 
@@ -630,7 +660,7 @@
                 offset={{ x: 175, y: 25 }}
               >
                 <MenuOption
-                  icon={mdiImageOutline}
+                  icon={mdiFileOutline}
                   text={$t('all_media')}
                   onClick={() => (assetTypeFilter = undefined)}
                 />
@@ -640,7 +670,7 @@
                   onClick={() => (assetTypeFilter = AssetTypeEnum.Image)}
                 />
                 <MenuOption
-                  icon={mdiVideo}
+                  icon={mdiVideoOutline}
                   text={$t('filter_videos_only')}
                   onClick={() => (assetTypeFilter = AssetTypeEnum.Video)}
                 />

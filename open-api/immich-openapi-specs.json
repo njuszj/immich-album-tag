@@ -1075,6 +1075,14 @@
         "operationId": "getAlbumInfo",
         "parameters": [
           {
+            "name": "assetType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
             "name": "id",
             "required": true,
             "in": "path",

@@ -8,6 +8,7 @@ import { AlbumUserCreateDto } from 'src/dtos/album.dto';
 import { DB } from 'src/schema';
 import { AlbumTable } from 'src/schema/tables/album.table';
 import { withDefaultVisibility } from 'src/utils/database';
+import { AssetType } from 'src/enum';
 
 export interface AlbumAssetCount {
   albumId: string;
@@ -17,9 +18,10 @@ export interface AlbumAssetCount {
   lastModifiedAssetTimestamp: Date | null;
 }
 
-export interface AlbumInfoOptions {
+export type AlbumInfoOptions = {
   withAssets: boolean;
-}
+  assetType?: AssetType;
+};
 
 const withOwner = (eb: ExpressionBuilder<DB, 'album'>) => {
   return jsonObjectFrom(eb.selectFrom('user').select(columns.user).whereRef('user.id', '=', 'album.ownerId'))
@@ -59,7 +61,7 @@ const withTags = (eb: ExpressionBuilder<DB, 'album'>) => {
   ).as('tags');
 };
 
-const withAssets = (eb: ExpressionBuilder<DB, 'album'>) => {
+const withAssets = (eb: ExpressionBuilder<DB, 'album'>, assetType?: AssetType) => {
   return eb
     .selectFrom((eb) =>
       eb
@@ -70,6 +72,7 @@ const withAssets = (eb: ExpressionBuilder<DB, 'album'>) => {
         .innerJoin('album_asset', 'album_asset.assetsId', 'asset.id')
         .whereRef('album_asset.albumsId', '=', 'album.id')
         .where('asset.deletedAt', 'is', null)
+        .$if(assetType !== undefined, (qb) => qb.where('asset.type', '=', assetType))
         .$call(withDefaultVisibility)
         .orderBy('asset.fileCreatedAt', 'desc')
         .as('asset'),
@@ -83,7 +86,7 @@ export class AlbumRepository {
   constructor(@InjectKysely() private db: Kysely<DB>) {}
 
   @GenerateSql({ params: [DummyValue.UUID, { withAssets: true }] })
-  async getById(id: string, options: AlbumInfoOptions) {
+  async getById(id: string, options: AlbumInfoOptions, assetType?: AssetType) {
     return this.db
       .selectFrom('album')
       .selectAll('album')
@@ -93,7 +96,7 @@ export class AlbumRepository {
       .select(withAlbumUsers)
       .select(withSharedLink)
       .select(withTags)
-      .$if(options.withAssets, (eb) => eb.select(withAssets))
+      .$if(options.withAssets, (eb) => eb.select(withAssets(eb, assetType)))
       .$narrowType<{ assets: NotNull }>()
       .executeTakeFirst();
   }
