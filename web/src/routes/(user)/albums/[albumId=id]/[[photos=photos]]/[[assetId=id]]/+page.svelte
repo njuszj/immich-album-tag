@@ -61,6 +61,7 @@
   import {
     AlbumUserRole,
     AssetOrder,
+    AssetTypeEnum,
     AssetVisibility,
     addAssetsToAlbum,
     addUsersToAlbum,
@@ -76,6 +77,7 @@
     mdiDeleteOutline,
     mdiDotsVertical,
     mdiDownload,
+    mdiFilter,
     mdiImageOutline,
     mdiImagePlusOutline,
     mdiLink,
@@ -83,6 +85,7 @@
     mdiPresentationPlay,
     mdiShareVariantOutline,
     mdiUpload,
+    mdiVideo,
   } from '@mdi/js';
   import { onDestroy } from 'svelte';
   import { t } from 'svelte-i18n';
@@ -105,6 +108,7 @@
   let isCreatingSharedAlbum = $state(false);
   let isShowActivity = $state(false);
   let albumOrder: AssetOrder | undefined = $state(data.album.order);
+  let assetTypeFilter: AssetTypeEnum | undefined = $state(undefined);
 
   const assetInteraction = new AssetInteraction();
   const timelineInteraction = new AssetInteraction();
@@ -333,12 +337,13 @@
 
   $effect(() => {
     if (viewMode === AlbumPageViewMode.VIEW) {
-      void timelineManager.updateOptions({ albumId, order: albumOrder });
+      void timelineManager.updateOptions({ albumId, order: albumOrder, assetType: assetTypeFilter });
     } else if (viewMode === AlbumPageViewMode.SELECT_ASSETS) {
       void timelineManager.updateOptions({
         visibility: AssetVisibility.Timeline,
         withPartners: true,
         timelineAlbumId: albumId,
+        assetType: assetTypeFilter,
       });
     }
   });
@@ -616,6 +621,31 @@
         <ControlAppBar showBackButton backIcon={mdiArrowLeft} onClose={() => goto(backUrl)}>
           {#snippet trailing()}
             <CastButton />
+
+            {#if album.assetCount > 0}
+              <ButtonContextMenu
+                icon={mdiFilter}
+                title={$t('filter_by_media_type')}
+                color="secondary"
+                offset={{ x: 175, y: 25 }}
+              >
+                <MenuOption
+                  icon={mdiImageOutline}
+                  text={$t('all_media')}
+                  onClick={() => (assetTypeFilter = undefined)}
+                />
+                <MenuOption
+                  icon={mdiImageOutline}
+                  text={$t('filter_images_only')}
+                  onClick={() => (assetTypeFilter = AssetTypeEnum.Image)}
+                />
+                <MenuOption
+                  icon={mdiVideo}
+                  text={$t('filter_videos_only')}
+                  onClick={() => (assetTypeFilter = AssetTypeEnum.Video)}
+                />
+              </ButtonContextMenu>
+            {/if}
 
             {#if isEditor}
               <IconButton
