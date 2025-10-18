@@ -76,7 +76,7 @@ export class AlbumService extends BaseService {
     await this.requireAccess({ auth, permission: Permission.AlbumRead, ids: [id] });
     await this.albumRepository.updateThumbnails();
     const withAssets = dto.withoutAssets === undefined ? true : !dto.withoutAssets;
-    const album = await this.findOrFail(id, { withAssets }, dto.assetType);
+    const album = await this.findOrFail(id, { withAssets: withAssets, assetType: dto.assetType });
     const [albumMetadataForIds] = await this.albumRepository.getMetadataForIds([album.id]);
 
     return {
@@ -321,7 +321,7 @@ export class AlbumService extends BaseService {
   }
 
   private async findOrFail(id: string, options: AlbumInfoOptions) {
-    const album = await this.albumRepository.getById(id, options, options.assetType);
+    const album = await this.albumRepository.getById(id, options);
     if (!album) {
       throw new BadRequestException('Album not found');
     }

@@ -5,10 +5,10 @@ import { InjectKysely } from 'nestjs-kysely';
 import { columns, Exif } from 'src/database';
 import { Chunked, ChunkedArray, ChunkedSet, DummyValue, GenerateSql } from 'src/decorators';
 import { AlbumUserCreateDto } from 'src/dtos/album.dto';
+import { AssetType } from 'src/enum';
 import { DB } from 'src/schema';
 import { AlbumTable } from 'src/schema/tables/album.table';
 import { withDefaultVisibility } from 'src/utils/database';
-import { AssetType } from 'src/enum';
 
 export interface AlbumAssetCount {
   albumId: string;
@@ -72,7 +72,7 @@ const withAssets = (eb: ExpressionBuilder<DB, 'album'>, assetType?: AssetType) =
         .innerJoin('album_asset', 'album_asset.assetsId', 'asset.id')
         .whereRef('album_asset.albumsId', '=', 'album.id')
         .where('asset.deletedAt', 'is', null)
-        .$if(assetType !== undefined, (qb) => qb.where('asset.type', '=', assetType))
+        .$if(assetType !== undefined, (qb) => qb.where('asset.type', '=', assetType !== undefined ? assetType : null))
         .$call(withDefaultVisibility)
         .orderBy('asset.fileCreatedAt', 'desc')
         .as('asset'),
@@ -86,7 +86,7 @@ export class AlbumRepository {
   constructor(@InjectKysely() private db: Kysely<DB>) {}
 
   @GenerateSql({ params: [DummyValue.UUID, { withAssets: true }] })
-  async getById(id: string, options: AlbumInfoOptions, assetType?: AssetType) {
+  async getById(id: string, options: AlbumInfoOptions) {
     return this.db
       .selectFrom('album')
       .selectAll('album')
@@ -96,7 +96,9 @@ export class AlbumRepository {
       .select(withAlbumUsers)
       .select(withSharedLink)
       .select(withTags)
-      .$if(options.withAssets, (eb) => eb.select(withAssets(eb, assetType)))
+      .$if(options.withAssets, (qb) =>
+        qb.select(withAssets(qb as unknown as ExpressionBuilder<DB, 'album'>, options.assetType)),
+      )
       .$narrowType<{ assets: NotNull }>()
       .executeTakeFirst();
   }
