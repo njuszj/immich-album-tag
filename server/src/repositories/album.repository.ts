@@ -61,7 +61,29 @@ const withTags = (eb: ExpressionBuilder<DB, 'album'>) => {
   ).as('tags');
 };
 
-const withAssets = (eb: ExpressionBuilder<DB, 'album'>, assetType?: AssetType) => {
+const withAssetsGenerator = (assetType?: AssetType) => {
+  return (eb: ExpressionBuilder<DB, 'album'>) => {
+    return eb
+      .selectFrom((eb) =>
+        eb
+          .selectFrom('asset')
+          .selectAll('asset')
+          .leftJoin('asset_exif', 'asset.id', 'asset_exif.assetId')
+          .select((eb) => eb.table('asset_exif').$castTo<Exif>().as('exifInfo'))
+          .innerJoin('album_asset', 'album_asset.assetsId', 'asset.id')
+          .whereRef('album_asset.albumsId', '=', 'album.id')
+          .where('asset.deletedAt', 'is', null)
+          .$if(assetType !== undefined, (qb) => qb.where('asset.type', '=', assetType !== undefined ? assetType : null))
+          .$call(withDefaultVisibility)
+          .orderBy('asset.fileCreatedAt', 'desc')
+          .as('asset'),
+      )
+      .select((eb) => eb.fn.jsonAgg('asset').as('assets'))
+      .as('assets');
+  };
+};
+
+const withAssets = (eb: ExpressionBuilder<DB, 'album'>) => {
   return eb
     .selectFrom((eb) =>
       eb
@@ -72,7 +94,6 @@ const withAssets = (eb: ExpressionBuilder<DB, 'album'>, assetType?: AssetType) =
         .innerJoin('album_asset', 'album_asset.assetsId', 'asset.id')
         .whereRef('album_asset.albumsId', '=', 'album.id')
         .where('asset.deletedAt', 'is', null)
-        .$if(assetType !== undefined, (qb) => qb.where('asset.type', '=', assetType !== undefined ? assetType : null))
         .$call(withDefaultVisibility)
         .orderBy('asset.fileCreatedAt', 'desc')
         .as('asset'),
@@ -96,9 +117,7 @@ export class AlbumRepository {
       .select(withAlbumUsers)
       .select(withSharedLink)
       .select(withTags)
-      .$if(options.withAssets, (qb) =>
-        qb.select(withAssets(qb as unknown as ExpressionBuilder<DB, 'album'>, options.assetType)),
-      )
+      .$if(options.withAssets, (qb) => qb.select(withAssetsGenerator(options.assetType)))
       .$narrowType<{ assets: NotNull }>()
       .executeTakeFirst();
   }

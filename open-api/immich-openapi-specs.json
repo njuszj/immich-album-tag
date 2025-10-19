@@ -6490,13 +6490,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerAboutResponseDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6524,13 +6517,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerApkLinksDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6558,13 +6544,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerConfigDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6579,13 +6558,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerFeaturesDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6625,16 +6597,6 @@
         "operationId": "getServerLicense",
         "parameters": [],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LicenseResponseDto"
-                }
-              }
-            },
-            "description": ""
-          },
           "404": {
             "description": ""
           }
@@ -6672,13 +6634,6 @@
         },
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LicenseResponseDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6707,13 +6662,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerMediaTypesResponseDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6728,13 +6676,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerPingResponse"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6749,13 +6690,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerStatsResponseDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6784,13 +6718,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerStorageResponseDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6818,13 +6745,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerThemeDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6839,13 +6759,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerVersionResponseDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6860,13 +6773,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VersionCheckStateResponseDto"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -6894,16 +6800,6 @@
         "parameters": [],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ServerVersionHistoryResponseDto"
-                  },
-                  "type": "array"
-                }
-              }
-            },
             "description": ""
           }
         },
@@ -14071,395 +13967,6 @@
         ],
         "type": "string"
       },
-      "ServerAboutResponseDto": {
-        "properties": {
-          "build": {
-            "type": "string"
-          },
-          "buildImage": {
-            "type": "string"
-          },
-          "buildImageUrl": {
-            "type": "string"
-          },
-          "buildUrl": {
-            "type": "string"
-          },
-          "exiftool": {
-            "type": "string"
-          },
-          "ffmpeg": {
-            "type": "string"
-          },
-          "imagemagick": {
-            "type": "string"
-          },
-          "libvips": {
-            "type": "string"
-          },
-          "licensed": {
-            "type": "boolean"
-          },
-          "nodejs": {
-            "type": "string"
-          },
-          "repository": {
-            "type": "string"
-          },
-          "repositoryUrl": {
-            "type": "string"
-          },
-          "sourceCommit": {
-            "type": "string"
-          },
-          "sourceRef": {
-            "type": "string"
-          },
-          "sourceUrl": {
-            "type": "string"
-          },
-          "thirdPartyBugFeatureUrl": {
-            "type": "string"
-          },
-          "thirdPartyDocumentationUrl": {
-            "type": "string"
-          },
-          "thirdPartySourceUrl": {
-            "type": "string"
-          },
-          "thirdPartySupportUrl": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          },
-          "versionUrl": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "licensed",
-          "version",
-          "versionUrl"
-        ],
-        "type": "object"
-      },
-      "ServerApkLinksDto": {
-        "properties": {
-          "arm64v8a": {
-            "type": "string"
-          },
-          "armeabiv7a": {
-            "type": "string"
-          },
-          "universal": {
-            "type": "string"
-          },
-          "x86_64": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "arm64v8a",
-          "armeabiv7a",
-          "universal",
-          "x86_64"
-        ],
-        "type": "object"
-      },
-      "ServerConfigDto": {
-        "properties": {
-          "externalDomain": {
-            "type": "string"
-          },
-          "isInitialized": {
-            "type": "boolean"
-          },
-          "isOnboarded": {
-            "type": "boolean"
-          },
-          "loginPageMessage": {
-            "type": "string"
-          },
-          "mapDarkStyleUrl": {
-            "type": "string"
-          },
-          "mapLightStyleUrl": {
-            "type": "string"
-          },
-          "oauthButtonText": {
-            "type": "string"
-          },
-          "publicUsers": {
-            "type": "boolean"
-          },
-          "trashDays": {
-            "type": "integer"
-          },
-          "userDeleteDelay": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "externalDomain",
-          "isInitialized",
-          "isOnboarded",
-          "loginPageMessage",
-          "mapDarkStyleUrl",
-          "mapLightStyleUrl",
-          "oauthButtonText",
-          "publicUsers",
-          "trashDays",
-          "userDeleteDelay"
-        ],
-        "type": "object"
-      },
-      "ServerFeaturesDto": {
-        "properties": {
-          "configFile": {
-            "type": "boolean"
-          },
-          "duplicateDetection": {
-            "type": "boolean"
-          },
-          "email": {
-            "type": "boolean"
-          },
-          "facialRecognition": {
-            "type": "boolean"
-          },
-          "importFaces": {
-            "type": "boolean"
-          },
-          "map": {
-            "type": "boolean"
-          },
-          "oauth": {
-            "type": "boolean"
-          },
-          "oauthAutoLaunch": {
-            "type": "boolean"
-          },
-          "passwordLogin": {
-            "type": "boolean"
-          },
-          "reverseGeocoding": {
-            "type": "boolean"
-          },
-          "search": {
-            "type": "boolean"
-          },
-          "sidecar": {
-            "type": "boolean"
-          },
-          "smartSearch": {
-            "type": "boolean"
-          },
-          "trash": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "configFile",
-          "duplicateDetection",
-          "email",
-          "facialRecognition",
-          "importFaces",
-          "map",
-          "oauth",
-          "oauthAutoLaunch",
-          "passwordLogin",
-          "reverseGeocoding",
-          "search",
-          "sidecar",
-          "smartSearch",
-          "trash"
-        ],
-        "type": "object"
-      },
-      "ServerMediaTypesResponseDto": {
-        "properties": {
-          "image": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "sidecar": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "video": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "image",
-          "sidecar",
-          "video"
-        ],
-        "type": "object"
-      },
-      "ServerPingResponse": {
-        "properties": {
-          "res": {
-            "example": "pong",
-            "readOnly": true,
-            "type": "string"
-          }
-        },
-        "required": [
-          "res"
-        ],
-        "type": "object"
-      },
-      "ServerStatsResponseDto": {
-        "properties": {
-          "photos": {
-            "default": 0,
-            "type": "integer"
-          },
-          "usage": {
-            "default": 0,
-            "format": "int64",
-            "type": "integer"
-          },
-          "usageByUser": {
-            "default": [],
-            "example": [
-              {
-                "photos": 1,
-                "videos": 1,
-                "diskUsageRaw": 2,
-                "usagePhotos": 1,
-                "usageVideos": 1
-              }
-            ],
-            "items": {
-              "$ref": "#/components/schemas/UsageByUserDto"
-            },
-            "title": "Array of usage for each user",
-            "type": "array"
-          },
-          "usagePhotos": {
-            "default": 0,
-            "format": "int64",
-            "type": "integer"
-          },
-          "usageVideos": {
-            "default": 0,
-            "format": "int64",
-            "type": "integer"
-          },
-          "videos": {
-            "default": 0,
-            "type": "integer"
-          }
-        },
-        "required": [
-          "photos",
-          "usage",
-          "usageByUser",
-          "usagePhotos",
-          "usageVideos",
-          "videos"
-        ],
-        "type": "object"
-      },
-      "ServerStorageResponseDto": {
-        "properties": {
-          "diskAvailable": {
-            "type": "string"
-          },
-          "diskAvailableRaw": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "diskSize": {
-            "type": "string"
-          },
-          "diskSizeRaw": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "diskUsagePercentage": {
-            "format": "double",
-            "type": "number"
-          },
-          "diskUse": {
-            "type": "string"
-          },
-          "diskUseRaw": {
-            "format": "int64",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "diskAvailable",
-          "diskAvailableRaw",
-          "diskSize",
-          "diskSizeRaw",
-          "diskUsagePercentage",
-          "diskUse",
-          "diskUseRaw"
-        ],
-        "type": "object"
-      },
-      "ServerThemeDto": {
-        "properties": {
-          "customCss": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "customCss"
-        ],
-        "type": "object"
-      },
-      "ServerVersionHistoryResponseDto": {
-        "properties": {
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "createdAt",
-          "id",
-          "version"
-        ],
-        "type": "object"
-      },
-      "ServerVersionResponseDto": {
-        "properties": {
-          "major": {
-            "type": "integer"
-          },
-          "minor": {
-            "type": "integer"
-          },
-          "patch": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "major",
-          "minor",
-          "patch"
-        ],
-        "type": "object"
-      },
       "SessionCreateDto": {
         "properties": {
           "deviceOS": {
@@ -17562,50 +17069,6 @@
             "type": "string"
           }
         },
-        "type": "object"
-      },
-      "UsageByUserDto": {
-        "properties": {
-          "photos": {
-            "type": "integer"
-          },
-          "quotaSizeInBytes": {
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "usage": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "usagePhotos": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "usageVideos": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "videos": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "photos",
-          "quotaSizeInBytes",
-          "usage",
-          "usagePhotos",
-          "usageVideos",
-          "userId",
-          "userName",
-          "videos"
-        ],
         "type": "object"
       },
       "UserAdminCreateDto": {
