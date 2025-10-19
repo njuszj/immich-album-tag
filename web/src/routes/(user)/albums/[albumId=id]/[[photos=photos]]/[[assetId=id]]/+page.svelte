@@ -91,6 +91,7 @@
   import { t } from 'svelte-i18n';
   import { fly } from 'svelte/transition';
   import type { PageData } from './$types';
+  import { openFileUploadDialog } from '$lib/utils/file-uploader';
 
   interface Props {
     data: PageData;
