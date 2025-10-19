@@ -12,7 +12,7 @@ export type OnUndoDelete = (assets: TimelineAsset[]) => void;
 export type OnRestore = (ids: string[]) => void;
 export type OnLink = (assets: { still: TimelineAsset; motion: TimelineAsset }) => void;
 export type OnUnlink = (assets: { still: TimelineAsset; motion: TimelineAsset }) => void;
-export type OnAddToAlbum = (ids: string[], albumId: string) => void;
+export type OnAddToAlbum = (ids: string[], albumId: string, move: boolean) => void;
 export type OnArchive = (ids: string[], visibility: AssetVisibility) => void;
 export type OnFavorite = (ids: string[], favorite: boolean) => void;
 export type OnStack = (result: StackResponse) => void;

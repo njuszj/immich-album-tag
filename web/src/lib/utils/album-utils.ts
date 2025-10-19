@@ -48,6 +48,23 @@ export const createAlbumAndRedirect = async (name?: string, assetIds?: string[])
 };
 
 /**
+ * Remove assets from an album
+ */
+export const removeAssetsFromAlbum = async (albumId: string, assetIds: string[]) => {
+  try {
+    await sdk.removeAssetFromAlbum({
+      id: albumId,
+      bulkIdsDto: {
+        ids: assetIds,
+      },
+    });
+  } catch (error) {
+    const $t = get(t);
+    handleError(error, $t('errors.error_removing_assets_from_album'));
+  }
+};
+
+/**
  * -------------
  * Album Sorting
  * -------------

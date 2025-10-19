@@ -53,6 +53,7 @@ export const addAssetsToAlbum = async (albumId: string, assetIds: string[], show
     },
   });
   const count = result.filter(({ success }) => success).length;
+  console.log('Result:', result);
   const duplicateErrorCount = result.filter(({ error }) => error === 'duplicate').length;
   const $t = get(t);
 

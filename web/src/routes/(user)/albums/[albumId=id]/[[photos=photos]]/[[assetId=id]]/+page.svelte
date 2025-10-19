@@ -307,6 +307,13 @@
     await refreshAlbum();
   };
 
+  const handleAddToAlbum = async (assetIds: string[], albumId: string, move: boolean) => {
+    if (move) {
+      timelineManager.removeAssets(assetIds);
+      await refreshAlbum();
+    }
+  };
+
   const handleUndoRemoveAssets = async (assets: TimelineAsset[]) => {
     timelineManager.addAssets(assets);
     await refreshAlbum();
@@ -604,7 +611,7 @@
         <CreateSharedLink />
         <SelectAllAssets {timelineManager} {assetInteraction} />
         <ButtonContextMenu icon={mdiPlus} title={$t('add_to')}>
-          <AddToAlbum />
+          <AddToAlbum onAddToAlbum={handleAddToAlbum} />
           <AddToAlbum shared />
         </ButtonContextMenu>
         {#if assetInteraction.isAllUserOwned}

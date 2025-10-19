@@ -19,18 +19,28 @@
   let loading = $state(true);
   let search = $state('');
   let selectedRowIndex: number = $state(-1);
+  let footerContainer: HTMLElement | undefined = $state(undefined);
+  let footerMounted = $state(false);
 
   interface Props {
     shared: boolean;
     onClose: (albums?: AlbumResponseDto[]) => void;
+    onFooterMount?: (element: HTMLElement) => void;
   }
 
-  let { shared, onClose }: Props = $props();
+  let { shared, onClose, onFooterMount }: Props = $props();
 
   onMount(async () => {
     albums = await getAllAlbums({ shared: shared || undefined });
     recentAlbums = albums.sort((a, b) => (new Date(a.updatedAt) > new Date(b.updatedAt) ? -1 : 1)).slice(0, 3);
     loading = false;
+  });
+
+  $effect(() => {
+    if (onFooterMount && footerContainer && !footerMounted) {
+      onFooterMount(footerContainer);
+      footerMounted = true;
+    }
   });
 
   const multiSelectedAlbumIds: string[] = $state([]);
@@ -201,21 +211,24 @@
     {/if}
   </ModalBody>
   <ModalFooter>
-    <div class="flex justify-around w-full">
-      <div class="flex gap-4">
-        <div class="flex gap-1 place-items-center">
-          <span class="bg-gray-300 dark:bg-gray-500 rounded p-1">
-            <Icon icon={mdiKeyboardReturn} size="1rem" />
-          </span>
-          <Text size="tiny">{$t('to_select')}</Text>
-        </div>
-        <div class="flex gap-1 place-items-center">
-          <span class="bg-gray-300 dark:bg-gray-500 rounded p-1">
-            <Text size="tiny">CTRL</Text>
-          </span>
-          <Text size="tiny">{$t('to_multi_select')}</Text>
+    <div class="w-full">
+      <div class="flex justify-around w-full">
+        <div class="flex gap-4">
+          <div class="flex gap-1 place-items-center">
+            <span class="bg-gray-300 dark:bg-gray-500 rounded p-1">
+              <Icon icon={mdiKeyboardReturn} size="1rem" />
+            </span>
+            <Text size="tiny">{$t('to_select')}</Text>
+          </div>
+          <div class="flex gap-1 place-items-center">
+            <span class="bg-gray-300 dark:bg-gray-500 rounded p-1">
+              <Text size="tiny">CTRL</Text>
+            </span>
+            <Text size="tiny">{$t('to_multi_select')}</Text>
+          </div>
         </div>
       </div>
+      <div class="mt-2" bind:this={footerContainer}></div>
     </div>
   </ModalFooter>
 </Modal>
